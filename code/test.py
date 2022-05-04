@@ -41,7 +41,10 @@ if __name__ == '__main__':
     # print(dataset)
     encoder_dataset = dataset.map(preprocess_function, batched=True)
     print(encoder_dataset)
+    print(encoder_dataset['train'])
+    print(encoder_dataset['test'])
     print(encoder_dataset['train'][0])
+    print(encoder_dataset['test'][0])
     model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=2)
     args = TrainingArguments(
         "./test-glue",
