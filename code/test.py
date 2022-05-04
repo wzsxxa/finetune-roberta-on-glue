@@ -38,7 +38,7 @@ if __name__ == '__main__':
         "cola": ("sentence", None)
     }
     sentence1_key, sentence2_key = task_to_key["cola"]
-    print(dataset)
+    # print(dataset)
     encoder_dataset = dataset.map(preprocess_function, batched=True)
     print(encoder_dataset)
     print(encoder_dataset['train'][0])
@@ -69,3 +69,4 @@ if __name__ == '__main__':
     ed = time.time()
     print(f"take {ed - bg} seconds to train")
     print(trainer.evaluate())
+    print(trainer.predict(encoder_dataset['test']))
