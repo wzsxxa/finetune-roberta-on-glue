@@ -45,11 +45,11 @@ if __name__ == '__main__':
     encoder_train_dataset = dataset['train'].map(preprocess_function, batched=True)
     encoder_val_dataset = dataset['validation'].map(preprocess_function, batched=True)
     encoder_test_dataset = dataset['test'].map(preprocess_function, batched=True)
-    print(encoder_dataset)
-    print(encoder_dataset['train'])
-    print(encoder_dataset['test'])
-    print(encoder_dataset['train'][0])
-    print(encoder_dataset['test'][0])
+    # print(encoder_dataset)
+    # print(encoder_dataset['train'])
+    # print(encoder_dataset['test'])
+    # print(encoder_dataset['train'][0])
+    # print(encoder_dataset['test'][0])
     model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=2)
     args = TrainingArguments(
         "./test-glue",
