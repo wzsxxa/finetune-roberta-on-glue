@@ -50,55 +50,55 @@ if __name__ == '__main__':
         "wnli": ("sentence1", "sentence2"),
     }
     with open('./data', 'w') as fp:
-    for i in range(len(GLUE_TASKS)):
-        task = GLUE_TASKS[i]
-        actual_task = "mnli" if task == "mnli-mm" else task
-        dataset = load_dataset('glue', actual_task)
-        metric = load_metric('glue', actual_task)
-    # model_name = "distilbert-base-uncased"
-        sentence1_key, sentence2_key = task_to_keys[task]
-    # print(dataset)
-        encoder_train_dataset = dataset['train'].map(preprocess_function, batched=True)
-        encoder_val_dataset = dataset['validation'].map(preprocess_function, batched=True)
-        encoder_test_dataset = dataset['test'].map(preprocess_function, batched=True)
-        num_labels = 3 if task.startswith("mnli") else 1 if task=="stsb" else 2
-    # print(encoder_dataset)
-    # print(encoder_dataset['train'])
-    # print(encoder_dataset['test'])
-    # print(encoder_dataset['train'][0])
-    # print(encoder_dataset['test'][0])
-        model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=num_labels)
-        metric_name = "pearson" if task == "stsb" else "matthews_correlation" if task == "cola" else "accuracy"
-        args = TrainingArguments(
-            "./"+task,
-            overwrite_output_dir=True,
-            evaluation_strategy = 'epoch',
-            save_strategy= 'epoch',
-            do_predict=True,
-            learning_rate=2e-5,
-            per_device_train_batch_size= 64,
-            per_device_eval_batch_size= 64,
-            num_train_epochs= 5,
-            weight_decay= 0.01,
-            load_best_model_at_end=True,
-            metric_for_best_model= metric_name
-        )
-        validation_key = "validation_mismatched" if task == "mnli-mm" else "validation_matched" if task == "mnli" else "validation"
-        trainer = Trainer(
-            model,
-            args,
-            train_dataset=encoder_train_dataset,
-            eval_dataset=encoder_val_dataset,
-            # train_dataset= encoder_dataset['train'],
-            # eval_dataset= encoder_dataset[validation_key],
-            tokenizer= tokenizer,
-            compute_metrics= compute_metrics
-        )
-        bg = time.time()
-        trainer.train()
-        ed = time.time()
-        fp.write(f"{task} "+str(ed - bg)+ "\t\t" + str(trainer.evaluate()))
-        fp.write("\n")
+        for i in range(len(GLUE_TASKS)):
+            task = GLUE_TASKS[i]
+            actual_task = "mnli" if task == "mnli-mm" else task
+            dataset = load_dataset('glue', actual_task)
+            metric = load_metric('glue', actual_task)
+        # model_name = "distilbert-base-uncased"
+            sentence1_key, sentence2_key = task_to_keys[task]
+        # print(dataset)
+            encoder_train_dataset = dataset['train'].map(preprocess_function, batched=True)
+            encoder_val_dataset = dataset['validation'].map(preprocess_function, batched=True)
+            encoder_test_dataset = dataset['test'].map(preprocess_function, batched=True)
+            num_labels = 3 if task.startswith("mnli") else 1 if task=="stsb" else 2
+        # print(encoder_dataset)
+        # print(encoder_dataset['train'])
+        # print(encoder_dataset['test'])
+        # print(encoder_dataset['train'][0])
+        # print(encoder_dataset['test'][0])
+            model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=num_labels)
+            metric_name = "pearson" if task == "stsb" else "matthews_correlation" if task == "cola" else "accuracy"
+            args = TrainingArguments(
+                "./"+task,
+                overwrite_output_dir=True,
+                evaluation_strategy = 'epoch',
+                save_strategy= 'epoch',
+                do_predict=True,
+                learning_rate=2e-5,
+                per_device_train_batch_size= 64,
+                per_device_eval_batch_size= 64,
+                num_train_epochs= 5,
+                weight_decay= 0.01,
+                load_best_model_at_end=True,
+                metric_for_best_model= metric_name
+            )
+            validation_key = "validation_mismatched" if task == "mnli-mm" else "validation_matched" if task == "mnli" else "validation"
+            trainer = Trainer(
+                model,
+                args,
+                train_dataset=encoder_train_dataset,
+                eval_dataset=encoder_val_dataset,
+                # train_dataset= encoder_dataset['train'],
+                # eval_dataset= encoder_dataset[validation_key],
+                tokenizer= tokenizer,
+                compute_metrics= compute_metrics
+            )
+            bg = time.time()
+            trainer.train()
+            ed = time.time()
+            fp.write(f"{task} "+str(ed - bg)+ "\t\t" + str(trainer.evaluate()))
+            fp.write("\n")
     fp.close()
     # print(f"take {ed - bg} seconds to train")
     # print(trainer.evaluate())
