@@ -62,3 +62,4 @@ if __name__ == '__main__':
         compute_metrics= compute_metrics
     )
     print("xian")
+    print(trainer.evaluate())
