@@ -57,10 +57,11 @@ if __name__ == '__main__':
             metric = load_metric('glue', actual_task, cache_dir="/mnt/sevenT/wxl/transformers_cache/")
         # model_name = "distilbert-base-uncased"
             sentence1_key, sentence2_key = task_to_keys[task]
+            encoder_dataset = dataset.map(preprocess_function, batched=True)
         # print(dataset)
-            encoder_train_dataset = dataset['train'].map(preprocess_function, batched=True)
-            encoder_val_dataset = dataset['validation'].map(preprocess_function, batched=True)
-            encoder_test_dataset = dataset['test'].map(preprocess_function, batched=True)
+        #     encoder_train_dataset = dataset['train'].map(preprocess_function, batched=True)
+        #     encoder_val_dataset = dataset['validation'].map(preprocess_function, batched=True)
+        #     encoder_test_dataset = dataset['test'].map(preprocess_function, batched=True)
             num_labels = 3 if task.startswith("mnli") else 1 if task=="stsb" else 2
         # print(encoder_dataset)
         # print(encoder_dataset['train'])
@@ -87,10 +88,10 @@ if __name__ == '__main__':
             trainer = Trainer(
                 model,
                 args,
-                train_dataset=encoder_train_dataset,
-                eval_dataset=encoder_val_dataset,
-                # train_dataset= encoder_dataset['train'],
-                # eval_dataset= encoder_dataset[validation_key],
+                # train_dataset=encoder_train_dataset,
+                # eval_dataset=encoder_val_dataset,
+                train_dataset= encoder_dataset['train'],
+                eval_dataset= encoder_dataset[validation_key],
                 tokenizer= tokenizer,
                 compute_metrics= compute_metrics
             )
