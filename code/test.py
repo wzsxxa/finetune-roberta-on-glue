@@ -69,4 +69,4 @@ if __name__ == '__main__':
     ed = time.time()
     print(f"take {ed - bg} seconds to train")
     print(trainer.evaluate())
-    print(trainer.predict(encoder_dataset['test']))
+    print(trainer.predict(encoder_dataset['validation']))
