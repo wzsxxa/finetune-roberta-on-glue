@@ -45,6 +45,7 @@ if __name__ == '__main__':
     model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=2)
     args = TrainingArguments(
         "./test-glue",
+        overwrite_output_dir=True,
         evaluation_strategy = 'epoch',
         save_strategy= 'epoch',
         do_predict=True,
