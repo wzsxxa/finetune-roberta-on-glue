@@ -4,6 +4,7 @@ from transformers import AutoTokenizer
 from transformers import AutoModelForSequenceClassification, TrainingArguments, Trainer
 import torch
 import time
+import numpy as np
 import torch.nn.functional as F
 
 def preprocess_function(examples):
@@ -13,7 +14,10 @@ def preprocess_function(examples):
 
 def compute_metrics(eval_pred):
     predictions, labels = eval_pred
-    predictions = predictions[:, 0]
+    if task != "stsb":
+        predictions = np.argmax(predictions, axis=1)
+    else:
+        predictions = predictions[:, 0]
     return metric.compute(predictions=predictions, references=labels)
 
 if __name__ == '__main__':
@@ -29,57 +33,74 @@ if __name__ == '__main__':
     # tokeniszer = AutoTokenizer.from_pretrained('roberta-base')
     # input_ids = tokeniszer('this is a sentence', 'this is another sentence')
     # print(input_ids)
+    # GLUE_TASKS = ["cola", "mnli", "mnli-mm", "mrpc", "qnli", "qqp", "rte", "sst2", "stsb", "wnli"]
+    GLUE_TASKS = ["cola"]
     model_name = "roberta-base"
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    print(tokenizer("what a nice day"))
-    dataset = load_dataset('glue', 'cola')
-    metric = load_metric('glue', 'cola')
-    # model_name = "distilbert-base-uncased"
-
-
-    task_to_key = {
-        "cola": ("sentence", None)
+    tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
+    task_to_keys = {
+        "cola": ("sentence", None),
+        "mnli": ("premise", "hypothesis"),
+        "mnli-mm": ("premise", "hypothesis"),
+        "mrpc": ("sentence1", "sentence2"),
+        "qnli": ("question", "sentence"),
+        "qqp": ("question1", "question2"),
+        "rte": ("sentence1", "sentence2"),
+        "sst2": ("sentence", None),
+        "stsb": ("sentence1", "sentence2"),
+        "wnli": ("sentence1", "sentence2"),
     }
-    sentence1_key, sentence2_key = task_to_key["cola"]
+    with open('./data', 'w') as fp:
+    for i in range(len(GLUE_TASKS)):
+        task = GLUE_TASKS[i]
+        actual_task = "mnli" if task == "mnli-mm" else task
+        dataset = load_dataset('glue', actual_task)
+        metric = load_metric('glue', actual_task)
+    # model_name = "distilbert-base-uncased"
+        sentence1_key, sentence2_key = task_to_keys[task]
     # print(dataset)
-    encoder_train_dataset = dataset['train'].map(preprocess_function, batched=True)
-    encoder_val_dataset = dataset['validation'].map(preprocess_function, batched=True)
-    encoder_test_dataset = dataset['test'].map(preprocess_function, batched=True)
+        encoder_train_dataset = dataset['train'].map(preprocess_function, batched=True)
+        encoder_val_dataset = dataset['validation'].map(preprocess_function, batched=True)
+        encoder_test_dataset = dataset['test'].map(preprocess_function, batched=True)
+        num_labels = 3 if task.startswith("mnli") else 1 if task=="stsb" else 2
     # print(encoder_dataset)
     # print(encoder_dataset['train'])
     # print(encoder_dataset['test'])
     # print(encoder_dataset['train'][0])
     # print(encoder_dataset['test'][0])
-    model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=2)
-    args = TrainingArguments(
-        "./test-glue",
-        overwrite_output_dir=True,
-        evaluation_strategy = 'epoch',
-        save_strategy= 'epoch',
-        do_predict=True,
-        learning_rate=2e-5,
-        per_device_train_batch_size= 64,
-        per_device_eval_batch_size= 64,
-        num_train_epochs= 5,
-        weight_decay= 0.01,
-        load_best_model_at_end=True,
-        metric_for_best_model= "matthews_correlation"
-    )
-    validation_key = "validation"
-    trainer = Trainer(
-        model,
-        args,
-        train_dataset=encoder_train_dataset,
-        eval_dataset=encoder_val_dataset,
-        # train_dataset= encoder_dataset['train'],
-        # eval_dataset= encoder_dataset[validation_key],
-        tokenizer= tokenizer,
-        compute_metrics= compute_metrics
-    )
-    bg = time.time()
-    trainer.train()
-    ed = time.time()
-    print(f"take {ed - bg} seconds to train")
-    print(trainer.evaluate())
-    print(trainer.predict(encoder_test_dataset))
+        model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=num_labels)
+        metric_name = "pearson" if task == "stsb" else "matthews_correlation" if task == "cola" else "accuracy"
+        args = TrainingArguments(
+            "./"+task,
+            overwrite_output_dir=True,
+            evaluation_strategy = 'epoch',
+            save_strategy= 'epoch',
+            do_predict=True,
+            learning_rate=2e-5,
+            per_device_train_batch_size= 64,
+            per_device_eval_batch_size= 64,
+            num_train_epochs= 5,
+            weight_decay= 0.01,
+            load_best_model_at_end=True,
+            metric_for_best_model= metric_name
+        )
+        validation_key = "validation_mismatched" if task == "mnli-mm" else "validation_matched" if task == "mnli" else "validation"
+        trainer = Trainer(
+            model,
+            args,
+            train_dataset=encoder_train_dataset,
+            eval_dataset=encoder_val_dataset,
+            # train_dataset= encoder_dataset['train'],
+            # eval_dataset= encoder_dataset[validation_key],
+            tokenizer= tokenizer,
+            compute_metrics= compute_metrics
+        )
+        bg = time.time()
+        trainer.train()
+        ed = time.time()
+        fp.write(f"{task} "+str(ed - bg)+ "\t\t" + str(trainer.evaluate()))
+        fp.write("\n")
+    fp.close()
+    # print(f"take {ed - bg} seconds to train")
+    # print(trainer.evaluate())
+    # print(trainer.predict(encoder_test_dataset))
     # print(trainer.predict(encoder_dataset['test'].map(preprocess_function, batched=True)))
