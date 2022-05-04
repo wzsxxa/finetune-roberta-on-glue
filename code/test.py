@@ -33,10 +33,10 @@ if __name__ == '__main__':
     # tokeniszer = AutoTokenizer.from_pretrained('roberta-base')
     # input_ids = tokeniszer('this is a sentence', 'this is another sentence')
     # print(input_ids)
-    GLUE_TASKS = ["cola", "mnli", "mnli-mm", "mrpc", "qnli", "qqp", "rte", "sst2", "stsb", "wnli"]
+    GLUE_TASKS = [ "mnli", "mnli-mm", "mrpc", "qnli", "qqp", "rte", "sst2", "stsb", "wnli"]
     # GLUE_TASKS = ["cola"]
     model_name = "roberta-base"
-    tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
+    tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True, cache_dir="/mnt/sevenT/wxl/transformers_cache/")
     task_to_keys = {
         "cola": ("sentence", None),
         "mnli": ("premise", "hypothesis"),
@@ -53,8 +53,8 @@ if __name__ == '__main__':
         for i in range(len(GLUE_TASKS)):
             task = GLUE_TASKS[i]
             actual_task = "mnli" if task == "mnli-mm" else task
-            dataset = load_dataset('glue', actual_task)
-            metric = load_metric('glue', actual_task)
+            dataset = load_dataset('glue', actual_task, cache_dir="/mnt/sevenT/wxl/transformers_cache/")
+            metric = load_metric('glue', actual_task, cache_dir="/mnt/sevenT/wxl/transformers_cache/")
         # model_name = "distilbert-base-uncased"
             sentence1_key, sentence2_key = task_to_keys[task]
         # print(dataset)
@@ -67,7 +67,7 @@ if __name__ == '__main__':
         # print(encoder_dataset['test'])
         # print(encoder_dataset['train'][0])
         # print(encoder_dataset['test'][0])
-            model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=num_labels)
+            model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=num_labels, cache_dir="/mnt/sevenT/wxl/transformers_cache/")
             metric_name = "pearson" if task == "stsb" else "matthews_correlation" if task == "cola" else "accuracy"
             args = TrainingArguments(
                 "/mnt/sevenT/wxl/"+task,
