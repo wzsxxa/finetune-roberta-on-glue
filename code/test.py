@@ -31,7 +31,8 @@ if __name__ == '__main__':
     # print(input_ids)
     dataset = load_dataset('glue', 'cola')
     metric = load_metric('glue', 'cola')
-    model_name = "distilbert-base-uncased"
+    # model_name = "distilbert-base-uncased"
+    model_name = "roberta-base"
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     task_to_key = {
         "cola": ("sentence", None)
@@ -52,7 +53,7 @@ if __name__ == '__main__':
         num_train_epochs= 5,
         weight_decay= 0.01,
         load_best_model_at_end=True,
-        metric_for_best_model= "metthews_correlation"
+        metric_for_best_model= "matthews_correlation"
     )
     validation_key = "validation"
     trainer = Trainer(
