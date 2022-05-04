@@ -29,11 +29,14 @@ if __name__ == '__main__':
     # tokeniszer = AutoTokenizer.from_pretrained('roberta-base')
     # input_ids = tokeniszer('this is a sentence', 'this is another sentence')
     # print(input_ids)
+    model_name = "roberta-base"
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    print(tokenizer("what a nice day"))
     dataset = load_dataset('glue', 'cola')
     metric = load_metric('glue', 'cola')
     # model_name = "distilbert-base-uncased"
-    model_name = "roberta-base"
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+
     task_to_key = {
         "cola": ("sentence", None)
     }
