@@ -70,7 +70,7 @@ if __name__ == '__main__':
             model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=num_labels)
             metric_name = "pearson" if task == "stsb" else "matthews_correlation" if task == "cola" else "accuracy"
             args = TrainingArguments(
-                "./"+task,
+                "/mnt/sevenT/wxl/"+task,
                 overwrite_output_dir=True,
                 evaluation_strategy = 'epoch',
                 save_strategy= 'epoch',
