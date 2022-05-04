@@ -72,4 +72,4 @@ if __name__ == '__main__':
     print(f"take {ed - bg} seconds to train")
     print(trainer.evaluate())
     print(trainer.predict(encoder_dataset['validation']))
-    print(trainer.predict(encoder_dataset['test']))
+    print(trainer.predict(encoder_dataset['test'].map(preprocess_function, batched=True)))
