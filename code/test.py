@@ -33,8 +33,8 @@ if __name__ == '__main__':
     # tokeniszer = AutoTokenizer.from_pretrained('roberta-base')
     # input_ids = tokeniszer('this is a sentence', 'this is another sentence')
     # print(input_ids)
-    # GLUE_TASKS = ["cola", "mnli", "mnli-mm", "mrpc", "qnli", "qqp", "rte", "sst2", "stsb", "wnli"]
-    GLUE_TASKS = ["cola"]
+    GLUE_TASKS = ["cola", "mnli", "mnli-mm", "mrpc", "qnli", "qqp", "rte", "sst2", "stsb", "wnli"]
+    # GLUE_TASKS = ["cola"]
     model_name = "roberta-base"
     tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
     task_to_keys = {
