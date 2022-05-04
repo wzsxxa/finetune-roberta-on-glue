@@ -31,7 +31,8 @@ if __name__ == '__main__':
     # print(input_ids)
     dataset = load_dataset('glue', 'cola')
     metric = load_metric('glue', 'cola')
-    tokenizer = AutoTokenizer.from_pretrained('roberta-base')
+    model_name = "distilbert-base-uncased"
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
     task_to_key = {
         "cola": ("sentence", None)
     }
@@ -40,7 +41,7 @@ if __name__ == '__main__':
     encoder_dataset = dataset.map(preprocess_function, batched=True)
     print(encoder_dataset)
     print(encoder_dataset['train'][0])
-    model = AutoModelForSequenceClassification.from_pretrained('roberta-base', num_labels=2)
+    model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=2)
     args = TrainingArguments(
         "./test-glue",
         evaluation_strategy = 'epoch',
