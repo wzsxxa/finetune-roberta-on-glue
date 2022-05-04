@@ -3,6 +3,7 @@ from datasets import load_dataset, load_metric
 from transformers import AutoTokenizer
 from transformers import AutoModelForSequenceClassification, TrainingArguments, Trainer
 import torch
+import time
 import torch.nn.functional as F
 
 def preprocess_function(examples):
@@ -61,5 +62,8 @@ if __name__ == '__main__':
         tokenizer= tokenizer,
         compute_metrics= compute_metrics
     )
-    print("xian")
+    bg = time.time()
+    trainer.train()
+    ed = time.time()
+    print(f"take {ed - bg} seconds to train")
     print(trainer.evaluate())
