@@ -42,7 +42,9 @@ if __name__ == '__main__':
     }
     sentence1_key, sentence2_key = task_to_key["cola"]
     # print(dataset)
-    encoder_dataset = dataset.map(preprocess_function, batched=True)
+    encoder_train_dataset = dataset['train'].map(preprocess_function, batched=True)
+    encoder_val_dataset = dataset['validation'].map(preprocess_function, batched=True)
+    encoder_test_dataset = dataset['test'].map(preprocess_function, batched=True)
     print(encoder_dataset)
     print(encoder_dataset['train'])
     print(encoder_dataset['test'])
@@ -67,8 +69,10 @@ if __name__ == '__main__':
     trainer = Trainer(
         model,
         args,
-        train_dataset= encoder_dataset['train'],
-        eval_dataset= encoder_dataset[validation_key],
+        train_dataset=encoder_train_dataset,
+        eval_dataset=encoder_val_dataset,
+        # train_dataset= encoder_dataset['train'],
+        # eval_dataset= encoder_dataset[validation_key],
         tokenizer= tokenizer,
         compute_metrics= compute_metrics
     )
@@ -77,5 +81,5 @@ if __name__ == '__main__':
     ed = time.time()
     print(f"take {ed - bg} seconds to train")
     print(trainer.evaluate())
-    print(trainer.predict(encoder_dataset['validation']))
-    print(trainer.predict(encoder_dataset['test'].map(preprocess_function, batched=True)))
+    print(trainer.predict(encoder_test_dataset))
+    # print(trainer.predict(encoder_dataset['test'].map(preprocess_function, batched=True)))
