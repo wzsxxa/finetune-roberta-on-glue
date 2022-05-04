@@ -47,6 +47,7 @@ if __name__ == '__main__':
         "./test-glue",
         evaluation_strategy = 'epoch',
         save_strategy= 'epoch',
+        do_predict=True,
         learning_rate=2e-5,
         per_device_train_batch_size= 64,
         per_device_eval_batch_size= 64,
