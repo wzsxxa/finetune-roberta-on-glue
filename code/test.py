@@ -52,6 +52,7 @@ if __name__ == '__main__':
     with open('./data', 'w') as fp:
         for i in range(len(GLUE_TASKS)):
             task = GLUE_TASKS[i]
+
             actual_task = "mnli" if task == "mnli-mm" else task
             dataset = load_dataset('glue', actual_task, cache_dir="/mnt/sevenT/wxl/transformers_cache/")
             metric = load_metric('glue', actual_task, cache_dir="/mnt/sevenT/wxl/transformers_cache/")
